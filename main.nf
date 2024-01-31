@@ -28,7 +28,7 @@ process SPLIT_FASTA {
   tuple val(sample_name), path(fasta_file)
 
   output:
-  tuple val(sample_name), path("*.fa")
+  path("*.fa")
 
   script:
   template "split_fasta_per_sequence.py"
@@ -63,13 +63,7 @@ workflow{
   SPLIT_FASTA(samplesInput)
   | set {splitFastas}
 
-  Channel.from()
-  | flatten()
-  | collect { [it[1].getName().minus("." + it[0] + ".fa"), it[1]] }
-  | groupBy { it[0] }
-  | set { FastaPerSeq }
-
-  CONCAT_FASTA(FastaPerSeq)
+  Channel.of(splitFastas)
   | view()
 
 }
