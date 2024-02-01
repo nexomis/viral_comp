@@ -1,0 +1,4 @@
+sample_name,fasta_file
+ASM3628630v1,/workspaces/viral_comp/data/test/in_genomes/ASM3628630v1.fna
+ASM3628635v1,/workspaces/viral_comp/data/test/in_genomes/ASM3628635v1.fna
+ASM3628640v1,/workspaces/viral_comp/data/test/in_genomes/ASM3628640v1.fna

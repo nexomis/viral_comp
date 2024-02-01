@@ -7,6 +7,7 @@ if ( params.help ) {
     |Required arguments:
     |  --sample_sheet   Sample sheet file (CSV format ,) with header as below:
     |                   `sample_name,fasta_file`
+    |  --ref_sample     Reference sample for the annotation
     |
   """.stripMargin()
   // Print the help with the stripped margin and exit
@@ -15,14 +16,21 @@ if ( params.help ) {
 }
 
 // Validate input parameters
-if (params.sample_sheet == '') {
+if (params.sample_sheet == null) {
   error """No samplesheet provided. Use --samplesheet to specify the path to the 
           | samplesheet file.""".stripMargin()
+}
+if (params.ref_sample == null) {
+  error """No ref_sample provided. Use --ref_sample reference sample for the
+          | annotation.""".stripMargin()
 }
 
 // Process 1: Split each fasta file into separate files per sequence
 process SPLIT_FASTA {
   container 'python:3.10'
+
+  label 'single_cpu'
+  label 'low_mem'
 
   input:
   tuple val(sample_name), path(fasta_file)
@@ -39,11 +47,14 @@ process CONCAT_FASTA {
 
   container "debian:stable-slim"
 
+  label 'single_cpu'
+  label 'low_mem'
+
   input:
   tuple val(seq_name), path(fasta_files)
 
   output:
-  path(seq_name + ".fa")
+  path "${seq_name}.fa"
 
   script:
   """
@@ -61,10 +72,14 @@ workflow{
   | set { samplesInput }
 
   SPLIT_FASTA(samplesInput)
+  | flatten() 
+  | map {tuple( it.name.split('\\.')[0], it )}
+  | groupTuple(by: 0)
   | set {splitFastas}
 
-  Channel.of(splitFastas)
+  CONCAT_FASTA(splitFastas)
   | view()
+
 
 }
 

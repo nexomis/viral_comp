@@ -6,12 +6,14 @@
         // Path is relative to the devcontainer.json file.
         "dockerfile": "Dockerfile"
     },
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+	
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"installDockerBuildx": true,
+			"version": "latest",
+			"dockerDashComposeVersion": "none"
+		}
+	},
 
 	"customizations": {
 		"vscode": {

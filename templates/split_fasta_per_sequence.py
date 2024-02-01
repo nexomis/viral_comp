@@ -2,7 +2,7 @@
 
 SAMPLE_NAME = "${sample_name}"
 NEW_SEQ_ID = ">${sample_name}"
-FASTA_FILE = ${fasta_file}
+FASTA_FILE = "${fasta_file}"
 
 def write_new_fasta(seq_name, sequences):
   if (len(sequences) > 1):
@@ -12,6 +12,7 @@ def write_new_fasta(seq_name, sequences):
 
 def main():
   sequences = [NEW_SEQ_ID]
+  seq_name = ""
   with open(FASTA_FILE) as in_file:
     for line in in_file.readlines():
       if (line.startswith(">")):
@@ -21,3 +22,4 @@ def main():
         sequences.append(line.rstrip())
   sequences= write_new_fasta(seq_name, sequences)
 
+main()
