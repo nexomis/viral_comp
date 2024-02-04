@@ -34,7 +34,7 @@ if (params.out_dir == null) {
 process SPLIT_FASTA {
   container 'python:3.10'
 
-  label 'single_cpu'
+  label 'cpu_x1'
   label 'low_mem'
 
   input:
@@ -52,7 +52,7 @@ process CONCAT_FASTA {
 
   container "debian:stable-slim"
 
-  label 'single_cpu'
+  label 'cpu_x1'
   label 'low_mem'
 
   input:
@@ -73,7 +73,7 @@ process ANNOT_REF {
 
   container "staphb/prokka:latest"
 
-  label 'multi_cpu'
+  label 'cpu_x8'
   label 'low_dyn_mem'
 
   input:
@@ -94,9 +94,9 @@ process ANNOT_REF {
 }
 
 process ALIGN_SEGMENT {
-  container "cbcrg/tcoffee:Version_13.46.0.919e8c6b"
+  container "quay.io/biocontainers/mafft:7.520--h031d066_2"
 
-  label 'multi_cpu'
+  label 'cpu_x8'
   label 'low_dyn_mem'
 
   input:
@@ -108,14 +108,14 @@ process ALIGN_SEGMENT {
   script:
   """
   #!/bin/bash
-  t_coffee $fasta_file -type=dna -mode mcoffee -outfile ${seq_name}.aln.fa -thread $task.cpus -debug -output fasta_aln
+  mafft --globalpair --thread $task.cpus --maxiterate 1000 $fasta_file > ${seq_name}.aln.fa
   """
 }
 
 process DISTRIBUTE_SEQS {
   container 'python:3.10'
 
-  label 'single_cpu'
+  label 'cpu_x1'
   label 'low_mem'
 
   input:
@@ -134,8 +134,8 @@ process DISTRIBUTE_SEQS {
 process ALIGN_CDS {
   container 'ghcr.io/nexomis/macse:v2.07.0'
 
-  label 'single_cpu'
-  label 'low_mem'
+  label 'cpu_x4'
+  label 'low_dyn_mem'
 
   input:
   tuple val(seq_name), path(fasta_file)
@@ -160,7 +160,7 @@ process ALIGN_CDS {
 process FORMAT_ALN_CDS {
   container 'python:3.10'
 
-  label 'single_cpu'
+  label 'cpu_x1'
   label 'low_mem'
 
   input:
@@ -178,7 +178,7 @@ process FORMAT_ALN_CDS {
 process FORMAT_ALN_NC {
   container 'python:3.10'
 
-  label 'single_cpu'
+  label 'cpu_x1'
   label 'low_mem'
 
   input:
