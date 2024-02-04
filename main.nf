@@ -96,7 +96,7 @@ process ANNOT_REF {
 process ALIGN_SEGMENT {
   container "cbcrg/tcoffee:Version_13.46.0.919e8c6b"
 
-  label 'multiple_cpu'
+  label 'multi_cpu'
   label 'low_dyn_mem'
 
   input:
