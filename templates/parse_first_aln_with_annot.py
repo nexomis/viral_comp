@@ -106,7 +106,7 @@ def get_seqs_from_annot(annot, seq_dict, remove_gap):
       sub_seq = seq[cds[0]-1:cds[1]].upper()
       if remove_gap: sub_seq = re.sub("[!?.-]", "", sub_seq).strip()
       if (cds[2] == "-"):
-        sub_seq = "".join([COMPLEMENT_DICT[base] for base in reversed(sub_seq)])
+        sub_seq = "".join([COMP[base] for base in reversed(sub_seq)])
       sub_seq_dict[seq_name] = sub_seq
     annot_seq_dict[cds[3]] = sub_seq_dict
   return annot_seq_dict
