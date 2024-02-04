@@ -82,7 +82,7 @@ process ANNOT_REF {
   output:
   tuple val(seq_name), path("reference_annotation/*")
 
-  publishDir "$params.out_dir"
+  publishDir "$params.out_dir", mode: 'copy'
 
   script:
   """
@@ -96,8 +96,8 @@ process ANNOT_REF {
 process ALIGN_SEGMENT {
   container "cbcrg/tcoffee:Version_13.46.0.919e8c6b"
 
-  label 'single_cpu'
-  label 'low_mem'
+  label 'multiple_cpu'
+  label 'low_dyn_mem'
 
   input:
   tuple val(seq_name), path(fasta_file)
@@ -124,7 +124,7 @@ process DISTRIBUTE_SEQS {
   output:
   path "{cds,nc}/*.fa", optional: true
 
-  publishDir "$params.out_dir", pattern: "nc/*"
+  publishDir "$params.out_dir", pattern: "nc/*", mode: 'copy'
 
   script:
   template "parse_first_aln_with_annot.py"
@@ -143,7 +143,7 @@ process ALIGN_CDS {
   output:
   tuple val(seq_name), path("aligned_cds/${seq_name}/NT_aln.fa"), path("aligned_cds/${seq_name}/AA_aln.fa")
 
-  publishDir "$params.out_dir"
+  publishDir "$params.out_dir", mode: 'copy'
 
   script:
   """
@@ -169,7 +169,7 @@ process FORMAT_ALN_CDS {
   output:
   path("cds_mutable/*/*"), optional: true
 
-  publishDir "$params.out_dir"
+  publishDir "$params.out_dir", mode: 'copy'
 
   script:
   template "format_aligned_cds.py"
@@ -187,7 +187,7 @@ process FORMAT_ALN_NC {
   output:
   path("nc_mutable/*"), optional: true
 
-  publishDir "$params.out_dir"
+  publishDir "$params.out_dir", mode: 'copy'
 
   script:
   template "format_aligned_nc.py"
