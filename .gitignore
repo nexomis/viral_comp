@@ -1,3 +1,4 @@
 work
 .github
 .nextflow*
+data/test/out_dir
