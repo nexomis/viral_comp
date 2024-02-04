@@ -97,7 +97,7 @@ process ALIGN_SEGMENT {
   container "quay.io/biocontainers/mafft:7.520--h031d066_2"
 
   label 'cpu_x8'
-  label 'low_dyn_mem'
+  label 'med_dyn_mem'
 
   input:
   tuple val(seq_name), path(fasta_file)
@@ -108,7 +108,7 @@ process ALIGN_SEGMENT {
   script:
   """
   #!/bin/bash
-  mafft --globalpair --thread $task.cpus --maxiterate 1000 $fasta_file > ${seq_name}.aln.fa
+  mafft --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
   """
 }
 
