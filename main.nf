@@ -94,7 +94,7 @@ process ANNOT_REF {
 }
 
 process ALIGN_SEGMENT {
-  container "cbcrg/tcoffee@sha256:9b42d8ca64720e44a12ca2d56cad7a897b3dfa9ebd1cefae2b651d343d896461"
+  container "cbcrg/tcoffee:Version_13.46.0.919e8c6b"
 
   label 'single_cpu'
   label 'low_mem'
