@@ -77,18 +77,19 @@ process ANNOT_REF {
   label 'low_dyn_mem'
 
   input:
-  tuple val(seq_name), path(fasta_files)
+  tuple val(ref_sample), path(fasta_files)
 
   output:
-  tuple val(seq_name), path("reference_annotation/*")
+  tuple val(ref_sample), path("reference_annotation/*")
 
   publishDir "$params.out_dir", mode: 'copy'
 
   script:
   """
   #!/bin/bash
+  cat $fasta_files > concat.fa
   prokka --kingdom Viruses --cpu $task.cpus --outdir reference_annotation \\
-  --locustag L --cdsrnaolap --quiet $fasta_files
+  --locustag L --cdsrnaolap --quiet concat.fa
   """
 
 }
@@ -108,7 +109,8 @@ process ALIGN_SEGMENT {
   script:
   """
   #!/bin/bash
-  mafft --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
+  mafft --adjustdirection --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
+  sed -i "s/>_R_/>/g" ${seq_name}.aln.fa
   """
 }
 
@@ -193,13 +195,23 @@ process FORMAT_ALN_NC {
   template "format_aligned_nc.py"
 }
 
-workflow{
+process GET_ORIENTED_REF {
+  container "python:3.10"
 
-  Channel.fromPath(params.sample_sheet)
-  | splitCsv(header: true, sep: ',', strip: true)
-  | map { row -> tuple(row.sample_name, row.fasta_file) }
-  | filter { it[0] == params.ref_sample }
-  | set {refInput}
+  label 'cpu_x1'
+  label 'low_mem'
+
+  input:
+  tuple  val(ref_sample) ,val(seq_name), path(aln_file)
+
+  output:
+  tuple val(ref_sample), path("oriented_${ref_sample}_${seq_name}.fa")
+
+  script:
+  template "get_oriented_ref.py"
+}
+
+workflow{
 
   Channel.fromPath(params.sample_sheet)
   | splitCsv(header: true, sep: ',', strip: true)
@@ -214,14 +226,18 @@ workflow{
 
   CONCAT_FASTA(splitFastas)
   | ALIGN_SEGMENT
-  | set {concatFasta}
+  | set {alignedSegment}
 
-  ANNOT_REF(refInput)
+  Channel.of(params.ref_sample)
+  | combine(alignedSegment)
+  | GET_ORIENTED_REF
+  | groupTuple(by: 0)
+  | ANNOT_REF
   | flatMap { key, items ->
         items.collect { item -> [key, item] }
     }
   | filter { it[1].getExtension() == "gff" }
-  | combine(concatFasta)
+  | combine(alignedSegment)
   | set {seqsToDistribute}
 
   DISTRIBUTE_SEQS(seqsToDistribute)
