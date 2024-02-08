@@ -35,7 +35,7 @@ process SPLIT_FASTA {
   container 'python:3.10'
 
   label 'cpu_x1'
-  label 'low_mem'
+  label 'mem_2G'
 
   input:
   tuple val(sample_name), path(fasta_file)
@@ -53,7 +53,7 @@ process CONCAT_FASTA {
   container "debian:stable-slim"
 
   label 'cpu_x1'
-  label 'low_mem'
+  label 'mem_2G'
 
   input:
   tuple val(seq_name), path(fasta_files)
@@ -74,7 +74,7 @@ process ANNOT_REF {
   container "staphb/prokka:latest"
 
   label 'cpu_x8'
-  label 'low_dyn_mem'
+  label 'mem_2G_per_cpu'
 
   input:
   tuple val(ref_sample), path(fasta_files)
@@ -95,7 +95,7 @@ process ANNOT_REF {
 }
 
 process ALIGN_SEGMENT {
-  container "quay.io/biocontainers/mafft:7.520--h031d066_2"
+  container "${params.biocontainers_registry}/biocontainers/mafft:7.520--h031d066_2"
 
   label 'cpu_x1'
   label 'mem_24G'
@@ -118,7 +118,7 @@ process DISTRIBUTE_SEQS {
   container 'python:3.10'
 
   label 'cpu_x1'
-  label 'low_mem'
+  label 'mem_2G'
 
   input:
   tuple val(ref_name), path(annot_file), val(seq_name), path(aln_file)
@@ -136,8 +136,8 @@ process DISTRIBUTE_SEQS {
 process ALIGN_CDS {
   container 'ghcr.io/nexomis/macse:v2.07.0'
 
-  label 'cpu_x4'
-  label 'low_dyn_mem'
+  label 'cpu_x1'
+  label 'mem_4G'
 
   input:
   tuple val(seq_name), path(fasta_file)
@@ -163,7 +163,7 @@ process FORMAT_ALN_CDS {
   container 'python:3.10'
 
   label 'cpu_x1'
-  label 'low_mem'
+  label 'mem_2G'
 
   input:
   tuple val(ref_sample), val(seq_name), path(nt_aln_file), path(aa_aln_file)
@@ -181,7 +181,7 @@ process FORMAT_ALN_NC {
   container 'python:3.10'
 
   label 'cpu_x1'
-  label 'low_mem'
+  label 'mem_2G'
 
   input:
   tuple val(ref_sample), val(seq_name), path(nt_aln_file)
@@ -199,7 +199,7 @@ process GET_ORIENTED_REF {
   container "python:3.10"
 
   label 'cpu_x1'
-  label 'low_mem'
+  label 'mem_2G'
 
   input:
   tuple  val(ref_sample) ,val(seq_name), path(aln_file)
