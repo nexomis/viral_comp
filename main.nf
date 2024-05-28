@@ -97,7 +97,7 @@ process ANNOT_REF {
 process ALIGN_SEGMENT {
   container "${params.biocontainers_registry}/biocontainers/mafft:7.520--h031d066_2"
 
-  label 'cpu_x1'
+  label 'cpu_x16'
   label 'mem_24G'
 
   input:
@@ -109,7 +109,7 @@ process ALIGN_SEGMENT {
   script:
   """
   #!/bin/bash
-  mafft --adjustdirection --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
+  mafft --adjustdirection --thread {$task.cpu} --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
   sed -i "s/>_R_/>/g" ${seq_name}.aln.fa
   """
 }
