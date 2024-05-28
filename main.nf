@@ -109,7 +109,7 @@ process ALIGN_SEGMENT {
   script:
   """
   #!/bin/bash
-  mafft --adjustdirection --thread {$task.cpu} --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
+  mafft --adjustdirection --retree 2 --thread $task.cpus --maxiterate 100 $fasta_file > ${seq_name}.aln.fa
   sed -i "s/>_R_/>/g" ${seq_name}.aln.fa
   """
 }
